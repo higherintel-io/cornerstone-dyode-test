@@ -6,10 +6,18 @@ import axios from 'axios';
         check if the a specific product exists in the cart.
         If true, then add a different product to the cart.
         */
+const addProductToCart = () => axios.get(`/cart.php?action=add&sku=${window.BCData.product_attributes.sku}`).then(() => {
+    alert('PRODUCT SUCCESSFULLY ADDED TO CART');
+}).catch(e => {
+    throw new Error('error occured while adding item to cart', e);
+});
 export default function () {
     utils.api.cart.getCart({}, (err, response) => {
     // if no cart items present or err return
-        if (err || !response) return;
+        if (err) return;
+        if (!response) {
+            addProductToCart();
+        }
         // get the current contents of the shopping cart
         const productData = response.lineItems.physicalItems;
         // extract just the sku number from the products currently in the cart
@@ -23,10 +31,6 @@ export default function () {
             return 'product already in cart, no update required';
         }
         // add item being viewed into user shopping cart
-        axios.get(`/cart.php?action=add&sku=${window.BCData.product_attributes.sku}`).then(() => {
-            alert('PRODUCT SUCCESSFULLY ADDED TO CART');
-        }).catch(e => {
-            throw new Error('error occured while adding item to cart', e);
-        });
+        addProductToCart();
     });
 }
